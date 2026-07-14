@@ -1,0 +1,4 @@
+pika
+sqlAlchemy
+pydantic
+python-dotenv

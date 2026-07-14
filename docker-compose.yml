@@ -1,0 +1,13 @@
+services:
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbit_container
+    ports:
+      - "5672:5672"
+    networks:
+      - api_microservice
+
+networks:
+  api_microservice:
+    driver: bridge
+    name: api_microservice

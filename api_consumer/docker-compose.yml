@@ -1,0 +1,28 @@
+services:
+  api_consumer:
+    container_name: api_consumer
+    build: .
+    networks:
+      - api_microservice
+    env_file:
+      - ../.env
+
+  postgres_db:
+    image: postgres:15
+    container_name: postgres_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - api_microservice
+    ports:
+      - "5432:5432"
+    env_file:
+      - ../.env
+
+networks:
+  api_microservice:
+    external: true
+    name: api_microservice
+
+volumes:
+  pg_data:

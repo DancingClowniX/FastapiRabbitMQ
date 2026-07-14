@@ -1,0 +1,17 @@
+services:
+  api_producer:
+    container_name: api_producer
+    build: .
+    environment:
+      - RABBITMQ_URL=amqp://rabbit_container:5672
+    networks:
+      - api_microservice
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../.env
+
+networks:
+  api_microservice:
+    external: true
+    name: api_microservice
