@@ -4,6 +4,7 @@ services:
     container_name: rabbit_container
     ports:
       - "5672:5672"
+      - "15672:15672"
     networks:
       - api_microservice
 
