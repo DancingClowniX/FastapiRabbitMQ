@@ -3,3 +3,4 @@ uvicorn
 pika
 pydantic
 python-dotenv
+faststream[rabbit]
