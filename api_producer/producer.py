@@ -1,10 +1,13 @@
 import uvicorn
 from fastapi import FastAPI, Depends
 import os
+from model.model import DataUser
 from fastapi.openapi.docs import get_swagger_ui_html
-from model.model import DataUser, RabbitMQService
+from faststream.rabbit.fastapi import RabbitRouter
+from dotenv import load_dotenv
+load_dotenv()
 app = FastAPI()
-
+router = RabbitRouter(os.getenv('RABBITMQ_URL'))
 
 @app.get("/api/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -18,20 +21,18 @@ async def custom_swagger_ui_html():
         swagger_css_url="https://unpkg.com",
     )
 
-@app.post("/send-message/")
+@router.post("/send-message/")
 async def create_user_event(data: DataUser = Depends(DataUser)):
-     rabbitmq = RabbitMQService()
-     try:
-         payload = f"User: {data.user}"
-         rabbitmq.send_message(message=payload)
-     finally:
-         rabbitmq.close()
-     return {"status": "success"}
+    playload = { "user": data.user,
+        "password": data.password
+                }
+    await router.broker.publish(playload, queue="my_queue")
+
+    return {"status": "success"}
 
 
 
-
-
+app.include_router(router)
 
 if __name__ == "__main__":
     uvicorn.run("producer:app", host="127.0.0.1", port=8000, reload=True)

@@ -2,32 +2,26 @@ import os
 import time
 import pika
 from dotenv import load_dotenv
+from faststream.rabbit import  RabbitBroker
+from faststream import FastStream
 
-QUEUE_NAME = "test_queue"
+import asyncio
+
+QUEUE_NAME = "my_queue"
 
 load_dotenv()
 
-RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
 
 
-def callback(ch, method, properties, body):
-    print(f" [Consumer] Поймал сообщение: '{body.decode()}'", flush=True)
+broker = RabbitBroker(os.getenv('RABBITMQ_URL'))
+app = FastStream(broker)
 
 
 print(" [Consumer] Ожидание подключения к RabbitMQ...")
-while True:
-    try:
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=RABBITMQ_HOST)
-        )
-        channel = connection.channel()
-        channel.queue_declare(queue=QUEUE_NAME,durable=True)
+@broker.subscriber("my_queue")
+async def handle_message(msg: dict):
+    # Этот код сработает автоматически, как только в очередь прилетит сообщение
+    print(f" [x] Получено сообщение из очереди: {msg}")
 
-        channel.basic_consume(
-            queue=QUEUE_NAME, on_message_callback=callback, auto_ack=True
-        )
-
-        print(" [Consumer] Успешно подключено! Жду сообщения...", flush=True)
-        channel.start_consuming()
-    except pika.exceptions.AMQPConnectionError:
-        time.sleep(2)
+if __name__ == "__main__":
+    asyncio.run(app.run())
