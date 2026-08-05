@@ -1,6 +1,6 @@
 from sqlalchemy import String, Column, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-
+from schema import UserSchema
 class Base(DeclarativeBase):
 	pass
 

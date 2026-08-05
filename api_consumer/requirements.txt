@@ -2,3 +2,4 @@ pika
 sqlAlchemy
 pydantic
 python-dotenv
+faststream[rabbit]
